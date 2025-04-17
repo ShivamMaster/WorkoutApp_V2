@@ -16,6 +16,12 @@ enum AppThemeMode: String, CaseIterable, Identifiable {
     }
 }
 
+class ThemeManager {
+    static var isDarkMode: Bool = false
+    static func toggleDarkMode() {
+        isDarkMode.toggle()
+    }
+}
 class ThemeManager: ObservableObject {
     static let shared = ThemeManager()
     

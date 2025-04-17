@@ -101,7 +101,7 @@ struct WorkoutTrackerApp: App {
             SplashScreen()
                 .environmentObject(dataManager)
                 .environmentObject(themeManager)
-                .preferredColorScheme(themeManager.themeMode.colorScheme)
+                .preferredColorScheme(ThemeManager.isDarkMode ? .dark : .light)
         }
     }
 } 

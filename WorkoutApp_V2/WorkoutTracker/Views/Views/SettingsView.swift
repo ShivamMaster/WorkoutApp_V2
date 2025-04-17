@@ -1,12 +1,10 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @State private var weightUnit = "kg"
     @State private var notificationsEnabled = true
     @State private var reminderTime = Date()
-    @StateObject private var themeManager = ThemeManager.shared
-    
-    let weightUnits = ["kg", "lbs"]
+    @State private var isDarkMode = ThemeManager.shared.isDarkMode
+
     
     var body: some View {
         NavigationView {
@@ -14,14 +12,11 @@ struct SettingsView: View {
                 Section(header: Text("Preferences")) {
                     Picker("Weight Unit", selection: $weightUnit) {
                         ForEach(weightUnits, id: \.self) {
-                            Text($0)
+                            Text("kg")
                         }
                     }
-                    
-                    Picker("Appearance", selection: $themeManager.themeMode) {
-                        ForEach(AppThemeMode.allCases) { mode in
-                            Text(mode.rawValue).tag(mode)
-                        }
+                    Toggle("Dark Mode", isOn: $isDarkMode) {
+                        ThemeManager.shared.toggleDarkMode()
                     }
                 }
                 
