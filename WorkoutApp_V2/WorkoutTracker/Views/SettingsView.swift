@@ -1,52 +1,78 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @State private var weightUnit = "kg"
-    @State private var notificationsEnabled = true
-    @State private var reminderTime = Date()
-    @State private var darkModeOn = false
+    @State private var weightUnit: String = "kg"
+    @State private var notificationsEnabled: Bool = false
+    @State private var reminderTime: Date = Date()
+    @State private var darkModeOn: Bool = false
     
+    @ObservedObject private var settingsManager = SettingsManager.shared
+
     let weightUnits = ["kg", "lbs"]
     
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Preferences")) {
-                    Picker("Weight Unit", selection: $weightUnit) {
-                        ForEach(weightUnits, id: \.self) {
-                            Text($0)
+                
+                    
+                
+                List {
+                    Section(header: Text("Preferences")) {
+                        Picker("Weight Unit", selection: $weightUnit) {
+                            ForEach(weightUnits, id: \.self) {
+                                Text($0)
+                            }
+                        }
+                        .onChange(of: weightUnit) {
+                            settingsManager.weightUnit = weightUnit
+                        }
+                        
+                        Toggle("Dark Mode", isOn: $darkModeOn)
+                            .onChange(of: darkModeOn) {
+                                settingsManager.darkModeEnabled = darkModeOn                            
+                            }
+                    }
+                    
+                    Section(header: Text("Reminders")) {
+                        Toggle("Enable Notifications", isOn: $notificationsEnabled)
+                            .onChange(of: notificationsEnabled) { newValue in
+                                settingsManager.notificationsEnabled = newValue
+                            }
+                        
+                        if notificationsEnabled {
+                            DatePicker("Reminder Time", selection: $reminderTime, displayedComponents: .hourAndMinute)
+                                .onChange(of: reminderTime) {
+                                    settingsManager.reminderTime = reminderTime
+                                }
                         }
                     }
                     
-                    Toggle("Dark Mode", isOn: $darkModeOn)
-                }
+                    Section(header: Text("About")) {
+                        HStack {
+                            Text("Version")
+                            Spacer()
+                            Text("1.0.0")
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        NavigationLink(destination: PrivacyPolicyView()) {
+                            Text("Privacy Policy")
+                        }
+                        
+                        Button("Rate the App") {
+                            // Link to App Store review
+                        }
+                    }
                 
-                Section(header: Text("Reminders")) {
-                    Toggle("Enable Notifications", isOn: $notificationsEnabled)
-                    
-                    if notificationsEnabled {
-                        DatePicker("Reminder Time", selection: $reminderTime, displayedComponents: .hourAndMinute)
-                    }
-                }
-                
-                Section(header: Text("About")) {
-                    HStack {
-                        Text("Version")
-                        Spacer()
-                        Text("1.0.0")
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    NavigationLink(destination: PrivacyPolicyView()) {
-                        Text("Privacy Policy")
-                    }
-                    
-                    Button("Rate the App") {
-                        // Link to App Store review
-                    }
                 }
             }
             .navigationTitle("Settings")
+            .onAppear {
+                    weightUnit = settingsManager.weightUnit
+                    notificationsEnabled = settingsManager.notificationsEnabled
+                    reminderTime = settingsManager.reminderTime
+                    darkModeOn = settingsManager.darkModeEnabled
+                }
         }
     }
 }
